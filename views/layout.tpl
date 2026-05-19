@@ -10,6 +10,7 @@
     <header>
         <nav>
             <a href="/" class="brand">GestionEvents</a>
+            <a href="/events/new" class="btn btn-primary btn-sm">+ Nouvel événement</a>
         </nav>
     </header>
     <main>

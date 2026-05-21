@@ -11,11 +11,19 @@ def register(app):
         with get_db() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
                 cur.execute(
-                    "SELECT id, titre, date_evenement, heure_debut, lieu, categorie, categorie_couleur"
-                    " FROM v_events_detail"
+                    "SELECT e.id, e.titre, e.date_evenement, e.heure_debut, e.lieu,"
+                    " e.categorie_id, c.nom AS categorie, c.couleur AS categorie_couleur"
+                    " FROM events e"
+                    " LEFT JOIN categories c ON e.categorie_id = c.id"
+                    " ORDER BY e.date_evenement ASC, e.heure_debut ASC"
                 )
                 events = cur.fetchall()
-        return template("event_list", events=events)
+
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("SELECT id, nom, couleur FROM categories ORDER BY nom")
+                categories = cur.fetchall()
+
+        return template("event_list", events=events, categories=categories)
 
     @app.route("/events/new", method=["GET", "POST"])
     def new_event():

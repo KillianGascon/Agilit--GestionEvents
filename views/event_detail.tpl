@@ -1,7 +1,12 @@
 % rebase('layout')
 <div class="detail-header">
     <a href="/" class="btn btn-back">&larr; Retour</a>
-    <a href="/events/{{event['id']}}/edit" class="btn btn-primary">Modifier</a>
+    <div class="detail-actions">
+        <a href="/events/{{event['id']}}/edit" class="btn btn-primary">Modifier</a>
+        <form action="/events/{{event['id']}}/delete" method="post" onsubmit="return confirm('Supprimer cet événement ? Cette action est irréversible.');">
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+        </form>
+    </div>
 </div>
 
 <div class="detail-card">

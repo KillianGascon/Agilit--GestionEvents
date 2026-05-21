@@ -129,6 +129,7 @@ SELECT
     e.heure_fin,
     e.lieu,
     e.description,
+    e.categorie_id,
     c.nom         AS categorie,
     c.couleur     AS categorie_couleur,
     u.nom         AS createur,

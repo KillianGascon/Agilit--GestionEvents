@@ -10,10 +10,20 @@
     <a href="/events/new" class="btn btn-primary">Créer le premier événement</a>
 </div>
 % else:
-<div class="events-grid">
+<div class="filtres">
+    <button class="filtre-btn active" data-categorie="all" onclick="filterByCategory(null)" id="filter-all">
+        Tous
+    </button>
+    % for categorie in categories:
+    <button class="filtre-btn" data-categorie="{{categorie['id']}}" onclick="filterByCategory({{categorie['id']}})" id="filter-{{categorie['id']}}">
+        {{categorie['nom']}}
+    </button>
+    % end
+</div>
+<div class="events-grid" id="events-grid">
     % for e in events:
     <a href="/events/{{e['id']}}" class="event-card-link">
-    <div class="event-card">
+    <div class="event-card" data-categorie-id="{{e['categorie_id'] if e.get('categorie_id') else ''}}" data-categorie="{{e['categorie'] if e.get('categorie') else ''}}">
         % if e['categorie']:
         <span class="badge" style="background:{{e['categorie_couleur'] or '#6366f1'}}">{{e['categorie']}}</span>
         % end
@@ -46,3 +56,43 @@
     % end
 </div>
 % end
+
+<script>
+let selectedFilter = null;
+let isFilterActive = false;
+
+function filterByCategory(categorieId) {
+    if (categorieId === null || selectedFilter === categorieId) {
+        selectedFilter = null;
+        isFilterActive = false;
+    } else {
+        selectedFilter = categorieId;
+        isFilterActive = true;
+    }
+
+    const eventCards = document.querySelectorAll('.event-card-link');
+    const filterButtons = document.querySelectorAll('.filtre-btn');
+
+    filterButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (!isFilterActive && btn.dataset.categorie === 'all') {
+            btn.classList.add('active');
+        } else if (isFilterActive && String(btn.dataset.categorie) === String(selectedFilter)) {
+            btn.classList.add('active');
+        }
+    });
+
+    eventCards.forEach(card => {
+        const eventElement = card.querySelector('.event-card');
+        const cardCategorieId = eventElement.dataset.categorieId;
+
+        if (!isFilterActive) {
+            card.style.display = '';
+        } else if (String(cardCategorieId) === String(selectedFilter)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>

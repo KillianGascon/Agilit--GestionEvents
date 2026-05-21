@@ -221,7 +221,24 @@ input:focus, select:focus, textarea:focus {
 /* Detail page */
 .detail-header {
     margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
+.detail-actions {
+    display: flex;
+    gap: .6rem;
+    align-items: center;
+}
+.detail-actions form {
+    margin: 0;
+}
+.btn-danger {
+    background: #e53e3e;
+    color: #fff;
+}
+.btn-danger:hover { opacity: .85; }
 .btn-back {
     background: #e2e8f0;
     color: #2c3e7a;

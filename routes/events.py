@@ -128,6 +128,13 @@ def register(app):
 
         return template("event_edit", errors={}, form=event, event=event, categories=categories)
 
+    @app.route("/events/<event_id:int>/delete", method="POST")
+    def event_delete(event_id):
+        with get_db() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM events WHERE id = %s", (event_id,))
+        redirect("/?deleted=1")
+
     @app.route("/events/<event_id:int>")
     def event_detail(event_id):
         with get_db() as conn:

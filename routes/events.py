@@ -66,6 +66,68 @@ def register(app):
 
         return template("event_form", errors={}, form={}, categories=categories, success=success)
 
+    @app.route("/events/<event_id:int>/edit", method=["GET", "POST"])
+    def event_edit(event_id):
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT id, titre, date_evenement, heure_debut, heure_fin,"
+                    " lieu, description, categorie_id"
+                    " FROM events WHERE id = %s",
+                    (event_id,),
+                )
+                event = cur.fetchone()
+        if not event:
+            from bottle import abort
+            abort(404, "Événement introuvable.")
+
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("SELECT id, nom, couleur FROM categories ORDER BY nom")
+                categories = cur.fetchall()
+
+        errors = {}
+
+        if request.method == "POST":
+            titre = request.forms.get("titre", "").strip()
+            date_evenement = request.forms.get("date_evenement", "").strip()
+            heure_debut = request.forms.get("heure_debut", "").strip()
+            heure_fin = request.forms.get("heure_fin", "").strip()
+            lieu = request.forms.get("lieu", "").strip()
+            description = request.forms.get("description", "").strip()
+            categorie_id = request.forms.get("categorie_id", "").strip()
+
+            if not titre:
+                errors["titre"] = "Le titre est obligatoire."
+            if not date_evenement:
+                errors["date_evenement"] = "La date est obligatoire."
+            if heure_debut and heure_fin and heure_fin <= heure_debut:
+                errors["heure_fin"] = "L'heure de fin doit être après l'heure de début."
+
+            if not errors:
+                with get_db() as conn:
+                    with conn.cursor() as cur:
+                        cur.execute(
+                            "UPDATE events SET titre=%s, date_evenement=%s, heure_debut=%s,"
+                            " heure_fin=%s, lieu=%s, description=%s, categorie_id=%s"
+                            " WHERE id=%s",
+                            (
+                                titre,
+                                date_evenement,
+                                heure_debut or None,
+                                heure_fin or None,
+                                lieu or None,
+                                description or None,
+                                int(categorie_id) if categorie_id else None,
+                                event_id,
+                            ),
+                        )
+                redirect(f"/events/{event_id}")
+
+            return template("event_edit", errors=errors, form=request.forms, event=event, categories=categories)
+
+        return template("event_edit", errors={}, form=event, event=event, categories=categories)
+
     @app.route("/events/<event_id:int>")
     def event_detail(event_id):
         with get_db() as conn:

@@ -12,6 +12,7 @@
 % else:
 <div class="events-grid">
     % for e in events:
+    <a href="/events/{{e['id']}}" class="event-card-link">
     <div class="event-card">
         % if e['categorie']:
         <span class="badge" style="background:{{e['categorie_couleur'] or '#6366f1'}}">{{e['categorie']}}</span>
@@ -41,6 +42,7 @@
             % end
         </div>
     </div>
+    </a>
     % end
 </div>
 % end

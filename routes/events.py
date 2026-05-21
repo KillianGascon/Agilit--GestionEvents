@@ -65,3 +65,20 @@ def register(app):
             return template("event_form", errors=errors, form=request.forms, categories=categories, success=False)
 
         return template("event_form", errors={}, form={}, categories=categories, success=success)
+
+    @app.route("/events/<event_id:int>")
+    def event_detail(event_id):
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT id, titre, date_evenement, heure_debut, heure_fin,"
+                    " lieu, description, categorie, categorie_couleur, createur,"
+                    " created_at, updated_at"
+                    " FROM v_events_detail WHERE id = %s",
+                    (event_id,),
+                )
+                event = cur.fetchone()
+        if not event:
+            from bottle import abort
+            abort(404, "Événement introuvable.")
+        return template("event_detail", event=event)

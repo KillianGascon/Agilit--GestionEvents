@@ -1,6 +1,7 @@
 % rebase('layout')
 <div class="detail-header">
     <a href="/" class="btn btn-back">&larr; Retour</a>
+    <a href="/events/{{event['id']}}/edit" class="btn btn-primary">Modifier</a>
 </div>
 
 <div class="detail-card">

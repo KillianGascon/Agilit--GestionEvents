@@ -3,6 +3,7 @@
     <a href="/" class="btn btn-back">&larr; Retour</a>
     <div class="detail-actions">
         <a href="/events/{{event['id']}}/edit" class="btn btn-primary">Modifier</a>
+        <a href="/events/{{event['id']}}/export.ics" class="btn btn-secondary" title="Télécharger en iCalendar">📅 Exporter (.ics)</a>
         <form action="/events/{{event['id']}}/delete" method="post" onsubmit="return confirm('Supprimer cet événement ? Cette action est irréversible.');">
             <button type="submit" class="btn btn-danger">Supprimer</button>
         </form>

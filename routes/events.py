@@ -1,7 +1,8 @@
 import psycopg2.extras
-from bottle import request, template, redirect
+from bottle import request, template, redirect, response, abort
 
 from db import get_db
+from ics_utils import build_calendar_from_events
 
 
 def register(app):
@@ -142,6 +143,35 @@ def register(app):
             with conn.cursor() as cur:
                 cur.execute("DELETE FROM events WHERE id = %s", (event_id,))
         redirect("/?deleted=1")
+
+    @app.route("/events/<event_id:int>/export.ics")
+    def event_export_ics(event_id):
+        """Télécharge l'événement au format iCalendar (.ics)."""
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT id, titre, date_evenement, heure_debut, heure_fin,"
+                    " lieu, description"
+                    " FROM events WHERE id = %s",
+                    (event_id,),
+                )
+                event = cur.fetchone()
+        if not event:
+            abort(404, "Événement introuvable.")
+
+        cal = build_calendar_from_events([event])
+        ics_bytes = cal.to_ical()
+
+        # Nom de fichier sûr (sans caractères spéciaux)
+        safe_titre = "".join(
+            c if c.isalnum() or c in "-_ " else "_"
+            for c in (event["titre"] or "evenement")
+        ).strip().replace(" ", "_")
+        filename = f"{safe_titre}_{event_id}.ics"
+
+        response.content_type = "text/calendar; charset=utf-8"
+        response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return ics_bytes
 
     @app.route("/events/<event_id:int>")
     def event_detail(event_id):

@@ -10,6 +10,9 @@
     <a href="/events/new" class="btn btn-primary">Créer le premier événement</a>
 </div>
 % else:
+<div class="search-bar">
+    <input type="text" id="search-input" placeholder="Rechercher par titre ou lieu..." oninput="applyFilters()" autocomplete="off">
+</div>
 <div class="filtres">
     <button class="filtre-btn active" data-categorie="all" onclick="filterByCategory(null)" id="filter-all">
         Tous
@@ -20,10 +23,17 @@
     </button>
     % end
 </div>
+<div id="no-results" class="empty-state" style="display:none;">
+    <p>Aucun événement ne correspond à votre recherche.</p>
+</div>
 <div class="events-grid" id="events-grid">
     % for e in events:
     <a href="/events/{{e['id']}}" class="event-card-link">
-    <div class="event-card" data-categorie-id="{{e['categorie_id'] if e.get('categorie_id') else ''}}" data-categorie="{{e['categorie'] if e.get('categorie') else ''}}">
+    <div class="event-card"
+         data-categorie-id="{{e['categorie_id'] if e.get('categorie_id') else ''}}"
+         data-categorie="{{e['categorie'] if e.get('categorie') else ''}}"
+         data-titre="{{e['titre'].lower()}}"
+         data-lieu="{{(e['lieu'] or '').lower()}}">
         % if e['categorie']:
         <span class="badge" style="background:{{e['categorie_couleur'] or '#6366f1'}}">{{e['categorie']}}</span>
         % end
@@ -70,9 +80,7 @@ function filterByCategory(categorieId) {
         isFilterActive = true;
     }
 
-    const eventCards = document.querySelectorAll('.event-card-link');
     const filterButtons = document.querySelectorAll('.filtre-btn');
-
     filterButtons.forEach(btn => {
         btn.classList.remove('active');
         if (!isFilterActive && btn.dataset.categorie === 'all') {
@@ -82,17 +90,31 @@ function filterByCategory(categorieId) {
         }
     });
 
-    eventCards.forEach(card => {
-        const eventElement = card.querySelector('.event-card');
-        const cardCategorieId = eventElement.dataset.categorieId;
+    applyFilters();
+}
 
-        if (!isFilterActive) {
+function applyFilters() {
+    const query = document.getElementById('search-input').value.trim().toLowerCase();
+    const eventCards = document.querySelectorAll('.event-card-link');
+    let visibleCount = 0;
+
+    eventCards.forEach(card => {
+        const el = card.querySelector('.event-card');
+        const cardCategorieId = el.dataset.categorieId;
+        const titre = el.dataset.titre || '';
+        const lieu = el.dataset.lieu || '';
+
+        const matchesCategory = !isFilterActive || String(cardCategorieId) === String(selectedFilter);
+        const matchesSearch = !query || titre.includes(query) || lieu.includes(query);
+
+        if (matchesCategory && matchesSearch) {
             card.style.display = '';
-        } else if (String(cardCategorieId) === String(selectedFilter)) {
-            card.style.display = '';
+            visibleCount++;
         } else {
             card.style.display = 'none';
         }
     });
+
+    document.getElementById('no-results').style.display = visibleCount === 0 ? '' : 'none';
 }
 </script>

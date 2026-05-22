@@ -43,6 +43,7 @@ nav {
 }
 .btn:hover { opacity: .85; }
 .btn-primary { background: #e67e22; color: #fff; }
+.btn-secondary { background: #64748b; color: #fff; }
 .btn-sm { padding: .35rem .85rem; font-size: .82rem; }
 
 /* Main */
@@ -135,6 +136,7 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 1.5rem;
 }
 .page-header h1 { font-size: 1.4rem; }
+.page-header-actions { display: flex; gap: .6rem; align-items: center; }
 
 /* Events grid */
 .events-grid {

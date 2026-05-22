@@ -1,7 +1,10 @@
 % rebase('layout')
 <div class="page-header">
     <h1>Événements</h1>
-    <a href="/events/new" class="btn btn-primary">+ Nouvel événement</a>
+    <div class="page-header-actions">
+        <a href="/export.ics" class="btn btn-secondary">⬇ Exporter .ics</a>
+        <a href="/events/new" class="btn btn-primary">+ Nouvel événement</a>
+    </div>
 </div>
 
 % if not events:

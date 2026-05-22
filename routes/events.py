@@ -173,6 +173,29 @@ def register(app):
         response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
         return ics_bytes
 
+    @app.route("/export.ics")
+    def export_all_ics():
+        with get_db() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    "SELECT id, titre, date_evenement, heure_debut, heure_fin,"
+                    " lieu, description"
+                    " FROM events"
+                    " ORDER BY date_evenement ASC, heure_debut ASC"
+                )
+                all_events = cur.fetchall()
+
+        cal = build_calendar_from_events(all_events)
+        ics_bytes = cal.to_ical()
+
+        import datetime as _dt
+        today = _dt.date.today().strftime("%Y%m%d")
+        filename = f"gestionevents_{today}.ics"
+
+        response.content_type = "text/calendar; charset=utf-8"
+        response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return ics_bytes
+
     @app.route("/events/<event_id:int>")
     def event_detail(event_id):
         with get_db() as conn:

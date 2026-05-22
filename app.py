@@ -1,6 +1,6 @@
 from bottle import Bottle, run, static_file
 
-from routes import events
+from routes import events, auth
 
 app = Bottle()
 
@@ -11,6 +11,7 @@ def serve_static(filepath):
 
 
 events.register(app)
+auth.register(app)
 
 
 if __name__ == "__main__":
